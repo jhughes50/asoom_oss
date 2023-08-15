@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-  <node pkg="image_transport" type="republish" name="republish" output="screen" args="compressed in:=/ovc/rgb/image_color out:=/asoom/img"/>
+  <node pkg="image_transport" type="republish" name="republish" output="screen" args="raw in:=/blackfly/image out:=/asoom/img"/>
 
   <node pkg="asoom" type="asoom_node" name="asoom" output="screen">
     <!-- Settings for adjusting perf -->
@@ -18,8 +18,8 @@
     <param name="keyframe_dist_thresh_m" value="2"/>
 
     <param name="rectifier_calib_path" value="$(find asoom)/config/titan_wide.yaml"/>
-    <remap from="~pose" to="/orbslam3_ros_node/pose"/>
-    <remap from="~gps" to="/ublox/fix"/>
+    <remap from="~pose" to="/mavros/local_position/pose"/>
+    <remap from="~gps" to="/mavros/global_position/raw/fix"/>
     <!--param name="rectifier_calib_path" value="$(find asoom)/config/aerial_pennov.yaml"/>
     <remap from="~pose" to="/sfm_pose"/>
     <remap from="~img" to="/ovc/bonus_left/left/image_color"/>
