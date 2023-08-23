@@ -15,8 +15,8 @@ Rectifier::Rectifier(const Params& params) {
   if (calib["cam0"]["camera_model"].as<std::string>() != "pinhole" || 
       (calib["cam0"]["distortion_model"].as<std::string>() != "radtan" &&
        calib["cam0"]["distortion_model"].as<std::string>() != "equidistant") ||
-      calib["cam0"]["distortion_coeffs"].size() < 4 ||
-      calib["cam0"]["intrinsics"].size() != 4 ||
+      //calib["cam0"]["distortion_coeffs"].size() < 4 ||
+      //calib["cam0"]["intrinsics"].size() != 4 ||
       calib["cam0"]["resolution"].size() != 2) {
     throw invalid_camera_exception();
   }
@@ -27,17 +27,8 @@ Rectifier::Rectifier(const Params& params) {
     is_fisheye_ = false;
   }
 
-  input_K_ = cv::Mat::eye(3, 3, CV_64F);
-  input_dist_ = cv::Mat::zeros(4, 1, CV_64F);
-
-  input_K_.at<double>(0, 0) = calib["cam0"]["intrinsics"][0].as<double>();
-  input_K_.at<double>(1, 1) = calib["cam0"]["intrinsics"][1].as<double>();
-  input_K_.at<double>(0, 2) = calib["cam0"]["intrinsics"][2].as<double>();
-  input_K_.at<double>(1, 2) = calib["cam0"]["intrinsics"][3].as<double>();
-
-  for (size_t ind=0; ind<4; ind++) {
-    input_dist_.at<double>(ind, 0) = calib["cam0"]["distortion_coeffs"][ind].as<double>();
-  }
+  input_K_ = loadRectificationParams(params.calib_path, "K");//cv::Mat::eye(3, 3, CV_64F);
+  input_dist_ = loadRectificationParams(params.calib_path, "D"); //cv::Mat::zeros(4, 1, CV_64F);
 
   input_size_.width = calib["cam0"]["resolution"][0].as<int>();
   input_size_.height = calib["cam0"]["resolution"][1].as<int>();
@@ -130,4 +121,24 @@ Eigen::Matrix3d Rectifier::getOutputK() const {
     cv::cv2eigen(output_K_, K_eig);
   }
   return K_eig;
+}
+
+cv::Mat Rectifier::loadRectificationParams(std::string file_path, std::string data)
+{
+  /* function to get params from WP calibration file.
+   * param file_path: path to yaml file with parameters
+   * param data: use K for intrinsic coefficients and D for distortion coefficients
+   */
+
+  cv::FileStorage fs(file_path, cv::FileStorage::READ);
+  cv::Mat M;
+  fs[data] >> M;
+
+  if (M.rows == 0 || M.cols == 0)
+    {
+      std::cout << "[RECTIFIER] unable to load calibration file" << std::endl;
+      throw invalid_camera_exception();
+    }
+
+  return M;
 }

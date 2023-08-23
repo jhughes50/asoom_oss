@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-  <node pkg="image_transport" type="republish" name="republish" output="screen" args="raw in:=/blackfly/image out:=/asoom/img"/>
-
+  <node pkg="image_transport" type="republish" name="republish" output="screen" args="raw in:=/sync/blackfly/downres/image out:=/asoom/img"/>
+  
   <node pkg="asoom" type="asoom_node" name="asoom" output="screen">
     <!-- Settings for adjusting perf -->
     <param name="stereo_use_sgbm" value="False"/>
@@ -12,14 +12,14 @@
 
     <param name="require_imgs" value="True"/>
     <param name="use_semantics" value="False"/>
-    <param name="use_gps_stamp" value="False"/>
+    <param name="use_gps_stamp" value="True"/>
     <param name="semantic_lut_path" value="$(find asoom)/config/semantic_lut.yaml"/>
     <param name="pose_graph_fix_scale" value="False"/>
     <param name="keyframe_dist_thresh_m" value="2"/>
 
-    <param name="rectifier_calib_path" value="$(find asoom)/config/titan_wide.yaml"/>
-    <remap from="~pose" to="/mavros/local_position/pose"/>
-    <remap from="~gps" to="/mavros/global_position/raw/fix"/>
+    <param name="rectifier_calib_path" value="$(find asoom)/config/blackfly_sim.yaml"/>
+    <remap from="~pose" to="/sync/pose"/>
+    <remap from="~gps" to="/sync/gps"/>
     <!--param name="rectifier_calib_path" value="$(find asoom)/config/aerial_pennov.yaml"/>
     <remap from="~pose" to="/sfm_pose"/>
     <remap from="~img" to="/ovc/bonus_left/left/image_color"/>

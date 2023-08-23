@@ -69,6 +69,8 @@ class Rectifier {
      */
     Eigen::Matrix3d getOutputK() const;
 
+    cv::Mat loadRectificationParams(std::string file_path, std::string data);
+  
     Eigen::Isometry3d getBodyCamPose() const {
       return T_body_cam_;
     }
